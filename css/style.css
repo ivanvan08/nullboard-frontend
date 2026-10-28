@@ -32,6 +32,7 @@ body {
 
 /* Top bar, like a status bar */
 .topbar {
+  flex-wrap: wrap;
   display: flex;
   align-items: baseline;
   gap: 16px;
@@ -44,11 +45,32 @@ body {
 .topbar h1 {
   margin: 0;
   font-size: 16px;
+}
+
+.topbar h1 a {
   color: var(--cyan);
+}
+
+.topbar nav {
+  display: flex;
+  gap: 12px;
 }
 
 .hint {
   color: var(--muted);
+}
+
+a {
+  color: var(--dark-foreground);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+a:focus-visible {
+  outline: 1px solid var(--accent);
 }
 
 /* Tiled "windows" */
@@ -115,13 +137,8 @@ select {
   border-top: none;
 }
 
-.thread-item {
-  cursor: pointer;
-}
-
-.thread-item:hover,
-.thread-item.active {
-  background: var(--selection);
+.list li.meta {
+  padding: 8px;
 }
 
 .title {
@@ -147,8 +164,16 @@ select {
   margin-right: 6px;
 }
 
-.thread-item.active .meta {
-  color: var(--dark-foreground);
+a.slug {
+  color: var(--cyan);
+}
+
+a.title {
+  color: var(--bright-foreground);
+}
+
+a.tag {
+  color: var(--magenta);
 }
 
 .locked {
@@ -163,7 +188,7 @@ select {
   color: var(--light-foreground);
 }
 
-#thread {
+.op {
   padding: 8px;
   margin-bottom: 8px;
   border: 1px solid var(--muted);

@@ -1,0 +1,184 @@
+/* Omarchy "Osaka Jade" palette */
+:root {
+  --background: #111c18;
+  --dark-background: #0c1512;
+  --darker-background: #090f0d;
+  --lighter-background: #23372B;
+  --selection: #32473B;
+  --foreground: #C1C497;
+  --dark-foreground: #81B8A8;
+  --light-foreground: #D6D5BC;
+  --bright-foreground: #F7E8B2;
+  --accent: #509475;
+  --muted: #53685B;
+  --cyan: #2DD5B7;
+  --red: #FF5345;
+  --bright-yellow: #E5C736;
+  --magenta: #D2689C;
+  --orange: #a2734b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 10px;
+  background: var(--darker-background);
+  color: var(--foreground);
+  font: 14px/1.5 "JetBrainsMono Nerd Font", "JetBrains Mono", "Fira Code", Menlo, Consolas, monospace;
+}
+
+/* Top bar, like a status bar */
+.topbar {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  padding: 4px 12px;
+  margin-bottom: 10px;
+  border: 1px solid var(--muted);
+  background: var(--dark-background);
+}
+
+.topbar h1 {
+  margin: 0;
+  font-size: 16px;
+  color: var(--cyan);
+}
+
+.hint {
+  color: var(--muted);
+}
+
+/* Tiled "windows" */
+.layout {
+  display: grid;
+  gap: 10px;
+}
+
+@media (min-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr 2fr;
+    align-items: start;
+  }
+
+  .wide {
+    grid-column: 1 / -1;
+  }
+}
+
+.panel {
+  border: 1px solid var(--accent);
+  background: var(--background);
+  padding: 10px 12px;
+  min-width: 0;
+}
+
+.panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.label {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: normal;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--dark-foreground);
+}
+
+select {
+  font: inherit;
+  color: var(--foreground);
+  background: var(--dark-background);
+  border: 1px solid var(--muted);
+  padding: 2px 4px;
+  text-transform: none;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.list li {
+  padding: 8px;
+  border-top: 1px solid var(--lighter-background);
+}
+
+.list li:first-child {
+  border-top: none;
+}
+
+.thread-item {
+  cursor: pointer;
+}
+
+.thread-item:hover,
+.thread-item.active {
+  background: var(--selection);
+}
+
+.title {
+  color: var(--bright-foreground);
+}
+
+.slug {
+  color: var(--cyan);
+}
+
+.meta {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.tag {
+  color: var(--magenta);
+  margin-right: 6px;
+}
+
+.pinned {
+  color: var(--bright-yellow);
+  margin-right: 6px;
+}
+
+.thread-item.active .meta {
+  color: var(--dark-foreground);
+}
+
+.locked {
+  color: var(--orange);
+  margin-right: 6px;
+}
+
+.body {
+  margin: 6px 0 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: var(--light-foreground);
+}
+
+#thread {
+  padding: 8px;
+  margin-bottom: 8px;
+  border: 1px solid var(--muted);
+  background: var(--dark-background);
+}
+
+.status:empty {
+  display: none;
+}
+
+.status {
+  margin: 0 0 8px;
+  color: var(--muted);
+}
+
+.status.error {
+  color: var(--red);
+}

@@ -27,18 +27,25 @@ API не має фільтра `?board=`, тому сторінка дошки �
 
 ## Як запустити проєкт
 
-1. Запустити бекенд (репозиторій `nullboard`, поруч із цією папкою):
+1. Завантажити й запустити бекенд, репозиторій
+   [ivanvan08/nullboard](https://github.com/ivanvan08/nullboard). Поки
+   pull request не змерджений, API лежить у гілці `feat/crud-api`:
 
    ```bash
-   cd ../nullboard
+   git clone https://github.com/ivanvan08/nullboard.git
+   cd nullboard
+   git switch feat/crud-api
+   python -m venv .venv
+   source .venv/bin/activate        # Windows: .venv\Scripts\activate
+   python -m pip install -r requirements.txt
    python manage.py migrate
    python manage.py runserver 8000
    ```
 
-2. В іншому терміналі віддати цю папку статичним сервером на порту 3000:
+2. В іншому терміналі, з кореня цього репозиторію, віддати файли статичним
+   сервером на порту 3000:
 
    ```bash
-   cd nullboard-frontend
    python -m http.server 3000
    ```
 

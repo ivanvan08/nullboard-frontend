@@ -12,6 +12,10 @@ class ApiError extends Error {
   }
 }
 
+// HTTP status code of the latest API answer (e.g. 201), shown in the
+// status line after a successful change.
+let lastStatus = 0;
+
 // Send a request to the API and return the parsed JSON body.
 // method: "GET", "POST", "PATCH" or "DELETE"; body: a plain object or undefined.
 // Returns null for 204 No Content. Throws ApiError on any non-2xx answer.
@@ -27,12 +31,18 @@ async function api(method, path, body) {
   } catch {
     throw new ApiError(0, "API at http://127.0.0.1:8000 is not running.");
   }
+  lastStatus = response.status;
   if (response.status === 204) return null;
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
     throw new ApiError(response.status, data.message || `HTTP ${response.status}`, data.fields);
   }
   return data;
+}
+
+// "409 · Thread #11 is locked..." - status code first, then the API message.
+function errorText(error) {
+  return `${error.status || "network"} · ${error.message}`;
 }
 
 // Create an element with a class and text (textContent is safe against XSS).

@@ -31,10 +31,9 @@ async function render() {
     nodes = await route(hash);
   } catch (error) {
     if (error.status === 404) {
-      nodes = renderNotFound(`404 · ${error.message}`);
+      nodes = renderNotFound(errorText(error));
     } else {
-      const box = el("p", "status error", `${error.status || "network"} · ${error.message}`);
-      nodes = [panel("error", box)];
+      nodes = [panel("error", el("p", "status error", errorText(error)))];
     }
   }
   // Ignore a slow answer if the user already went to another page.

@@ -28,16 +28,32 @@ function buildForm(fields, submitText, send) {
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
-    form.querySelector(".form-error").textContent = "";
+    for (const node of form.querySelectorAll(".form-error, .field-error")) node.textContent = "";
     try {
       const message = await send(readForm(form, fields));
-      flash(message);
+      flash(`${lastStatus} · ${message}`);
       await render();
     } catch (error) {
-      form.querySelector(".form-error").textContent = error.message;
+      showFormError(form, error);
     }
   });
   return form;
+}
+
+// Show an ApiError inside a form: "409 · message" above the button and,
+// for 400 answers with "fields", each field's messages under that field.
+function showFormError(form, error) {
+  const formError = form.querySelector(".form-error");
+  formError.textContent = errorText(error);
+  for (const [name, messages] of Object.entries(error.fields)) {
+    const row = form.querySelector(`[data-field="${name}"]`);
+    if (row) {
+      row.querySelector(".field-error").textContent = messages.join(" ");
+    } else {
+      // A field this form has no input for: show it with the main message.
+      formError.textContent += ` (${name}: ${messages.join(" ")})`;
+    }
+  }
 }
 
 // One labelled input (or a group of checkboxes) for buildForm.
@@ -57,7 +73,8 @@ function fieldRow(field) {
       label.append(box, ` ${option}`);
       group.append(label);
     }
-    row.append(group);
+    row.dataset.field = field.name;
+    row.append(group, el("span", "field-error"));
     return row;
   }
 
@@ -79,7 +96,8 @@ function fieldRow(field) {
   }
   input.name = field.name;
   input.value = field.value || "";
-  row.append(el("span", "field-label", field.label), input);
+  row.dataset.field = field.name;
+  row.append(el("span", "field-label", field.label), input, el("span", "field-error"));
   return row;
 }
 
@@ -113,10 +131,10 @@ function actionButton(text, action, className = "") {
     try {
       const message = await action();
       if (message === null) return;
-      flash(message);
+      flash(`${lastStatus} · ${message}`);
       await render();
     } catch (error) {
-      flash(error.message, true);
+      flash(errorText(error), true);
     }
   });
   return button;

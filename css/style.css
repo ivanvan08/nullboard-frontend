@@ -324,3 +324,17 @@ button.danger {
 .form .status {
   margin: 0;
 }
+
+/* Validation messages from the API, under the matching input */
+.field-error {
+  font-size: 12px;
+  color: var(--red);
+}
+
+.field-error:empty {
+  display: none;
+}
+
+.field:has(.field-error:not(:empty)) :is(input, textarea, select) {
+  border-color: var(--red);
+}

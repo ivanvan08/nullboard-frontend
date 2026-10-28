@@ -207,3 +207,120 @@ a.tag {
 .status.error {
   color: var(--red);
 }
+
+/* Status line under the top bar (success and error messages) */
+.flash {
+  padding: 4px 12px;
+  margin: -4px 0 10px;
+  border: 1px solid var(--muted);
+  background: var(--dark-background);
+  color: var(--cyan);
+}
+
+.flash.error {
+  border-color: var(--red);
+}
+
+/* Inline forms */
+.foldout {
+  margin: 6px 0;
+}
+
+.foldout summary {
+  cursor: pointer;
+  color: var(--dark-foreground);
+}
+
+.foldout[open] summary {
+  color: var(--cyan);
+}
+
+.form {
+  display: grid;
+  gap: 6px;
+  margin: 6px 0;
+  padding: 8px;
+  border: 1px solid var(--lighter-background);
+  background: var(--dark-background);
+}
+
+.field {
+  display: grid;
+  gap: 2px;
+}
+
+.field-label {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+
+input[type="text"],
+textarea,
+button {
+  font: inherit;
+  color: var(--foreground);
+  background: var(--darker-background);
+  border: 1px solid var(--muted);
+  border-radius: 0;
+  padding: 2px 6px;
+  min-width: 0;
+}
+
+textarea {
+  resize: vertical;
+}
+
+input[type="checkbox"] {
+  accent-color: var(--accent);
+}
+
+input:focus,
+textarea:focus,
+select:focus,
+button:focus-visible,
+summary:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 0;
+  border-color: var(--accent);
+}
+
+button {
+  cursor: pointer;
+  justify-self: start;
+  color: var(--cyan);
+}
+
+button:hover {
+  background: var(--selection);
+}
+
+button.danger {
+  color: var(--red);
+}
+
+/* Row of "edit", "pin", "delete"... under an item */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 12px;
+  margin-top: 4px;
+}
+
+.toolbar .foldout {
+  margin: 0;
+}
+
+.toolbar .foldout[open] {
+  flex-basis: 100%;
+}
+
+.form .status {
+  margin: 0;
+}

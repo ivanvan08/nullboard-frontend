@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nullboard</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1>Nullboard</h1>
+    <span class="hint">anonymous imageboard &middot; api v1</span>
+  </header>
+
+  <main class="layout">
+    <section class="panel">
+      <h2 class="label">boards</h2>
+      <p id="boards-status" class="status"></p>
+      <ul id="boards" class="list"></ul>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2 class="label">threads</h2>
+        <label class="label">
+          order
+          <select id="ordering">
+            <option value="-bumped_at">Active</option>
+            <option value="-created_at">New</option>
+            <option value="-reply_count">Most replies</option>
+          </select>
+        </label>
+      </div>
+      <p id="threads-status" class="status"></p>
+      <ul id="threads" class="list"></ul>
+    </section>
+
+    <section id="thread-view" class="panel wide" hidden>
+      <h2 class="label">thread</h2>
+      <article id="thread"></article>
+      <p id="posts-status" class="status"></p>
+      <ul id="posts" class="list"></ul>
+    </section>
+  </main>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

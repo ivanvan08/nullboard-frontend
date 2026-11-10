@@ -58,10 +58,26 @@ function showFormError(form, error) {
 
 // One labelled input (or a group of checkboxes) for buildForm.
 function fieldRow(field) {
-  const row = el("div", "row");
+  const row = el("div", "field");
   row.dataset.field = field.name;
-  const label = el("label", "", field.label);
-  if (field.type !== "checkboxes") label.setAttribute("for", `field-${field.name}`);
+  const label = el("label", "field-label", field.label);
+
+  if (field.type === "checkboxes") {
+    const group = el("div", "checks");
+    for (const opt of field.options) {
+      const boxLabel = el("label", "checkbox-label");
+      const box = el("input");
+      box.type = "checkbox";
+      box.name = field.name;
+      box.value = opt;
+      box.checked = (field.value || []).includes(opt);
+      boxLabel.append(box, ` #${opt}`);
+      group.append(boxLabel);
+    }
+    row.dataset.field = field.name;
+    row.append(label, group, el("span", "field-error"));
+    return row;
+  }
 
   let input;
   if (field.type === "textarea") {
@@ -80,18 +96,6 @@ function fieldRow(field) {
       if (opt === field.value) option.selected = true;
       input.append(option);
     }
-  } else if (field.type === "checkboxes") {
-    input = el("div", "checkboxes");
-    for (const opt of field.options) {
-      const boxLabel = el("label", "checkbox-label");
-      const box = el("input");
-      box.type = "checkbox";
-      box.name = field.name;
-      box.value = opt;
-      box.checked = (field.value || []).includes(opt);
-      boxLabel.append(box, ` #${opt}`);
-      input.append(boxLabel);
-    }
   } else {
     input = el("input");
     input.type = field.type || "text";
@@ -99,7 +103,8 @@ function fieldRow(field) {
   }
   input.name = field.name;
   input.id = `field-${field.name}`;
-  row.append(label, input, el("span", "status error field-error"));
+  label.setAttribute("for", input.id);
+  row.append(label, input, el("span", "field-error"));
   return row;
 }
 

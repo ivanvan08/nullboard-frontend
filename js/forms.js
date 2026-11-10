@@ -61,7 +61,7 @@ function fieldRow(field) {
   const row = el("div", "row");
   row.dataset.field = field.name;
   const label = el("label", "", field.label);
-  label.setAttribute("for", `field-${field.name}`);
+  if (field.type !== "checkboxes") label.setAttribute("for", `field-${field.name}`);
 
   let input;
   if (field.type === "textarea") {
@@ -86,7 +86,9 @@ function fieldRow(field) {
       const boxLabel = el("label", "checkbox-label");
       const box = el("input");
       box.type = "checkbox";
+      box.name = field.name;
       box.value = opt;
+      box.checked = (field.value || []).includes(opt);
       boxLabel.append(box, ` #${opt}`);
       input.append(boxLabel);
     }
@@ -98,48 +100,6 @@ function fieldRow(field) {
   input.name = field.name;
   input.id = `field-${field.name}`;
   row.append(label, input, el("span", "status error field-error"));
-  return row;
-}
-  if (field.type === "checkboxes") {
-    const row = el("div", "field");
-    row.append(el("span", "field-label", field.label));
-    const group = el("span", "checks");
-    if (!field.options.length) group.append(el("span", "meta", "none"));
-    for (const option of field.options) {
-      const box = el("input");
-      box.type = "checkbox";
-      box.name = field.name;
-      box.value = option;
-      box.checked = (field.value || []).includes(option);
-      const label = el("label");
-      label.append(box, ` ${option}`);
-      group.append(label);
-    }
-    row.dataset.field = field.name;
-    row.append(group, el("span", "field-error"));
-    return row;
-  }
-
-  const row = el("label", "field");
-  let input;
-  if (field.type === "textarea") {
-    input = el("textarea");
-    input.rows = 3;
-  } else if (field.type === "select") {
-    input = el("select");
-    for (const option of field.options) {
-      const item = el("option", "", option);
-      item.value = option;
-      input.append(item);
-    }
-  } else {
-    input = el("input");
-    input.type = "text";
-  }
-  input.name = field.name;
-  input.value = field.value || "";
-  row.dataset.field = field.name;
-  row.append(el("span", "field-label", field.label), input, el("span", "field-error"));
   return row;
 }
 

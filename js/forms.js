@@ -58,6 +58,48 @@ function showFormError(form, error) {
 
 // One labelled input (or a group of checkboxes) for buildForm.
 function fieldRow(field) {
+  const row = el("div", "row");
+  row.dataset.field = field.name;
+  const label = el("label", "", field.label);
+  label.setAttribute("for", `field-${field.name}`);
+
+  let input;
+  if (field.type === "textarea") {
+    input = el("textarea");
+    input.rows = 4;
+    input.value = field.value || "";
+  } else if (field.type === "password") {
+    input = el("input");
+    input.type = "password";
+    input.value = field.value || "";
+  } else if (field.type === "select") {
+    input = el("select");
+    for (const opt of field.options) {
+      const option = el("option", "", opt);
+      option.value = opt;
+      if (opt === field.value) option.selected = true;
+      input.append(option);
+    }
+  } else if (field.type === "checkboxes") {
+    input = el("div", "checkboxes");
+    for (const opt of field.options) {
+      const boxLabel = el("label", "checkbox-label");
+      const box = el("input");
+      box.type = "checkbox";
+      box.value = opt;
+      boxLabel.append(box, ` #${opt}`);
+      input.append(boxLabel);
+    }
+  } else {
+    input = el("input");
+    input.type = field.type || "text";
+    input.value = field.value || "";
+  }
+  input.name = field.name;
+  input.id = `field-${field.name}`;
+  row.append(label, input, el("span", "status error field-error"));
+  return row;
+}
   if (field.type === "checkboxes") {
     const row = el("div", "field");
     row.append(el("span", "field-label", field.label));

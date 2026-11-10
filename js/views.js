@@ -45,6 +45,17 @@ function threadList(threads) {
 
 // "new thread" form. boardSlugs: boards to choose from; selected: preselected board.
 function newThreadForm(boardSlugs, tagSlugs, selected) {
+  if (!isAuthenticated()) {
+    const box = el("div", "auth-guard-notice");
+    box.append(
+      "Want to start a new discussion? ",
+      link(`#/login?next=${encodeURIComponent(location.hash || "#/")}`, "Log in here"),
+      " or ",
+      link(`#/register?next=${encodeURIComponent(location.hash || "#/")}`, "register a new account"),
+      "."
+    );
+    return box;
+  }
   const form = buildForm(
     [
       { name: "board", label: "board", type: "select", options: boardSlugs, value: selected },
@@ -257,19 +268,32 @@ async function renderThread(id) {
     list.append(item);
   }
 
-  const replyForm = buildForm(
-    [
-      { name: "body", label: "body", type: "textarea" },
-      { name: "name", label: "name (optional)" },
-    ],
-    "reply",
-    async (values) => {
-      const post = await api("POST", `/threads/${thread.id}/posts/`, values);
-      return `post #${post.id} created`;
-    },
-  );
+  let replySection;
+  if (!isAuthenticated()) {
+    const box = el("div", "auth-guard-notice");
+    box.append(
+      "You must be logged in to reply to this thread. ",
+      link(`#/login?next=${encodeURIComponent(location.hash)}`, "Log in"),
+      " or ",
+      link(`#/register?next=${encodeURIComponent(location.hash)}`, "register an account"),
+      "."
+    );
+    replySection = box;
+  } else {
+    replySection = buildForm(
+      [
+        { name: "body", label: "body", type: "textarea" },
+        { name: "name", label: "name (optional)" },
+      ],
+      "reply",
+      async (values) => {
+        const post = await api("POST", `/threads/${thread.id}/posts/`, values);
+        return `post #${post.id} created`;
+      },
+    );
+  }
 
-  const view = panel("thread", op, list, el("h2", "label", "reply"), replyForm);
+  const view = panel("thread", op, list, el("h2", "label", "reply"), replySection);
   view.classList.add("wide");
   return [view];
 }
@@ -315,6 +339,175 @@ async function renderTags() {
   const view = panel("tags", foldout("[+] new tag", newTag), list);
   view.classList.add("wide");
   return [view];
+}
+
+// Login page view
+function renderLogin(nextRoute = "#/") {
+  if (isAuthenticated()) {
+    location.hash = "#/";
+    return [];
+  }
+
+  const notice = el("p", "meta", "Enter your credentials to access your account and create threads/replies.");
+  const form = buildForm(
+    [
+      { name: "username", label: "username", type: "text" },
+      { name: "password", label: "password", type: "password" },
+    ],
+    "Login",
+    async (values) => {
+      const data = await api("POST", "/auth/login/", values);
+      // Fetch user profile
+      const user = await api("GET", "/auth/me/", undefined, false, data.access).catch(() => ({
+        username: values.username,
+        is_staff: false,
+      }));
+      setAuth({ access: data.access, refresh: data.refresh, user });
+      showFlash(`Welcome back, ${user.username}!`);
+      location.hash = nextRoute;
+      return "logged in successfully";
+    }
+  );
+
+  const card = panel("LOGIN", notice, form);
+  card.classList.add("auth-card");
+
+  const switchP = el("p", "auth-switch");
+  switchP.append("Don't have an account? ", link(`#/register?next=${encodeURIComponent(nextRoute)}`, "Register here"));
+  card.append(switchP);
+
+  return [card];
+}
+
+// Registration page view
+function renderRegister(nextRoute = "#/") {
+  if (isAuthenticated()) {
+    location.hash = "#/";
+    return [];
+  }
+
+  const notice = el("p", "meta", "Create an account to participate in discussions and create threads.");
+  const form = buildForm(
+    [
+      { name: "username", label: "username (required)" },
+      { name: "email", label: "email (required)", type: "email" },
+      { name: "first_name", label: "first name (optional)" },
+      { name: "last_name", label: "last name (optional)" },
+      { name: "password", label: "password (min 8 chars)", type: "password" },
+      { name: "password_confirmation", label: "confirm password", type: "password" },
+    ],
+    "Register",
+    async (values) => {
+      const data = await api("POST", "/auth/register/", values);
+      setAuth({ access: data.access, refresh: data.refresh, user: data.user });
+      showFlash(`Account created! Welcome, ${data.user.username}!`);
+      location.hash = nextRoute;
+      return "account created successfully";
+    }
+  );
+
+  const card = panel("REGISTER", notice, form);
+  card.classList.add("auth-card");
+
+  const switchP = el("p", "auth-switch");
+  switchP.append("Already have an account? ", link(`#/login?next=${encodeURIComponent(nextRoute)}`, "Log in here"));
+  card.append(switchP);
+
+  return [card];
+}
+
+// Admin / Moderator dashboard (Role-guarded page)
+async function renderAdmin() {
+  if (!isAuthenticated()) {
+    location.hash = `#/login?next=${encodeURIComponent("#/admin")}`;
+    return [];
+  }
+
+  const user = getCurrentUser();
+  if (!user || !user.is_staff) {
+    const forbiddenCard = panel(
+      "ACCESS DENIED (403)",
+      el("p", "status error", "403 · You must be an administrator to access the admin panel."),
+      el("p", "meta", `Logged in as: ${user ? user.username : "unknown"} (role: regular user). Board & tag management is restricted to staff.`),
+      link("#/", "← Return to board feed")
+    );
+    forbiddenCard.classList.add("wide");
+    return [forbiddenCard];
+  }
+
+  const [boards, tags] = await Promise.all([
+    api("GET", "/boards/"),
+    api("GET", "/tags/"),
+  ]);
+
+  const intro = el("div", "admin-intro");
+  intro.append(
+    el("p", "meta", `Welcome to the Administration Console, ${user.username}. Here you can manage forum boards, categories and tags.`)
+  );
+
+  // New Board Form
+  const newBoardForm = buildForm(
+    [
+      { name: "slug", label: "slug" },
+      { name: "title", label: "title" },
+      { name: "description", label: "description" },
+    ],
+    "Create Board",
+    async (values) => {
+      const b = await api("POST", "/boards/", values);
+      return `Board /${b.slug}/ created`;
+    }
+  );
+
+  // New Tag Form
+  const newTagForm = buildForm(
+    [
+      { name: "slug", label: "slug" },
+      { name: "title", label: "title" },
+    ],
+    "Create Tag",
+    async (values) => {
+      const t = await api("POST", "/tags/", values);
+      return `Tag #${t.slug} created`;
+    }
+  );
+
+  const boardManageList = el("ul", "list");
+  for (const b of boards) {
+    const editForm = buildForm(
+      [
+        { name: "title", label: "title", value: b.title },
+        { name: "description", label: "description", type: "textarea", value: b.description },
+      ],
+      "Save Board",
+      async (values) => {
+        await api("PATCH", `/boards/${b.slug}/`, values);
+        return `Board /${b.slug}/ updated`;
+      }
+    );
+    const item = el("li");
+    item.append(
+      link(`#/boards/${b.slug}`, `/${b.slug}/`, "slug"),
+      " ",
+      el("span", "title", b.title),
+      toolbar(
+        foldout("edit", editForm),
+        deleteButton(`Delete board /${b.slug}/ and all its threads?`, `/boards/${b.slug}/`, `board /${b.slug}/ deleted`)
+      )
+    );
+    boardManageList.append(item);
+  }
+
+  const adminView = panel(
+    "ADMIN DASHBOARD",
+    intro,
+    foldout("[+] Add New Board", newBoardForm),
+    el("h3", "label", "Manage Existing Boards"),
+    boardManageList,
+    foldout("[+] Add New Tag", newTagForm)
+  );
+  adminView.classList.add("wide");
+  return [adminView];
 }
 
 // Shown for unknown routes and for 404 answers from the API.

@@ -34,12 +34,14 @@ body {
 .topbar {
   flex-wrap: wrap;
   display: flex;
-  align-items: baseline;
+  align-items: center;
+  justify-content: space-between;
   gap: 16px;
-  padding: 4px 12px;
-  margin-bottom: 10px;
+  padding: 8px 14px;
+  margin-bottom: 12px;
   border: 1px solid var(--muted);
   background: var(--dark-background);
+  border-radius: 4px;
 }
 
 .topbar h1 {
@@ -49,11 +51,134 @@ body {
 
 .topbar h1 a {
   color: var(--cyan);
+  text-decoration: none;
 }
 
 .topbar nav {
   display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.topbar nav a {
+  color: var(--foreground);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.topbar nav a:hover {
+  color: var(--cyan);
+}
+
+.auth-bar {
+  display: flex;
+  align-items: center;
   gap: 12px;
+  margin-left: auto;
+}
+
+.auth-user-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--bright-foreground);
+  font-size: 13px;
+  background: var(--lighter-background);
+  padding: 3px 8px;
+  border-radius: 3px;
+  border: 1px solid var(--accent);
+}
+
+.user-icon {
+  color: var(--cyan);
+  font-size: 10px;
+}
+
+.role-tag {
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: 2px;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.role-tag.admin {
+  background: var(--red);
+  color: #fff;
+}
+
+.role-tag.user {
+  background: var(--muted);
+  color: var(--bright-foreground);
+}
+
+.auth-link {
+  color: var(--foreground);
+  text-decoration: none;
+  font-size: 13px;
+  padding: 3px 8px;
+  border: 1px solid var(--muted);
+  border-radius: 3px;
+  transition: all 0.15s ease;
+}
+
+.auth-link:hover {
+  border-color: var(--cyan);
+  color: var(--cyan);
+}
+
+.auth-link.highlight {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.auth-link.highlight:hover {
+  background: var(--cyan);
+  border-color: var(--cyan);
+  color: var(--darker-background);
+}
+
+.btn-subtle {
+  background: transparent;
+  border: 1px solid var(--muted);
+  color: var(--dark-foreground);
+  padding: 3px 8px;
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  border-radius: 3px;
+}
+
+.btn-subtle:hover {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.auth-card {
+  max-width: 440px;
+  margin: 40px auto;
+  border: 1px solid var(--accent);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.auth-switch {
+  margin-top: 14px;
+  font-size: 13px;
+  color: var(--dark-foreground);
+}
+
+.auth-switch a {
+  color: var(--cyan);
+}
+
+.auth-guard-notice {
+  padding: 10px;
+  background: var(--lighter-background);
+  border-left: 3px solid var(--bright-yellow);
+  margin-bottom: 15px;
+  font-size: 13px;
+  color: var(--bright-foreground);
 }
 
 .hint {

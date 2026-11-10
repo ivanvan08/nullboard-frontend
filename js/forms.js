@@ -58,46 +58,53 @@ function showFormError(form, error) {
 
 // One labelled input (or a group of checkboxes) for buildForm.
 function fieldRow(field) {
+  const row = el("div", "field");
+  row.dataset.field = field.name;
+  const label = el("label", "field-label", field.label);
+
   if (field.type === "checkboxes") {
-    const row = el("div", "field");
-    row.append(el("span", "field-label", field.label));
-    const group = el("span", "checks");
-    if (!field.options.length) group.append(el("span", "meta", "none"));
-    for (const option of field.options) {
+    const group = el("div", "checks");
+    for (const opt of field.options) {
+      const boxLabel = el("label", "checkbox-label");
       const box = el("input");
       box.type = "checkbox";
       box.name = field.name;
-      box.value = option;
-      box.checked = (field.value || []).includes(option);
-      const label = el("label");
-      label.append(box, ` ${option}`);
-      group.append(label);
+      box.value = opt;
+      box.checked = (field.value || []).includes(opt);
+      boxLabel.append(box, ` #${opt}`);
+      group.append(boxLabel);
     }
     row.dataset.field = field.name;
-    row.append(group, el("span", "field-error"));
+    row.append(label, group, el("span", "field-error"));
     return row;
   }
 
-  const row = el("label", "field");
   let input;
   if (field.type === "textarea") {
     input = el("textarea");
-    input.rows = 3;
+    input.rows = 4;
+    input.value = field.value || "";
+  } else if (field.type === "password") {
+    input = el("input");
+    input.type = "password";
+    input.value = field.value || "";
   } else if (field.type === "select") {
     input = el("select");
-    for (const option of field.options) {
-      const item = el("option", "", option);
-      item.value = option;
-      input.append(item);
+    for (const opt of field.options) {
+      const option = el("option", "", opt);
+      option.value = opt;
+      if (opt === field.value) option.selected = true;
+      input.append(option);
     }
   } else {
     input = el("input");
-    input.type = "text";
+    input.type = field.type || "text";
+    input.value = field.value || "";
   }
   input.name = field.name;
-  input.value = field.value || "";
-  row.dataset.field = field.name;
-  row.append(el("span", "field-label", field.label), input, el("span", "field-error"));
+  input.id = `field-${field.name}`;
+  label.setAttribute("for", input.id);
+  row.append(label, input, el("span", "field-error"));
   return row;
 }
 

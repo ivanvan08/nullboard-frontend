@@ -357,13 +357,16 @@ function renderLogin(nextRoute = "#/") {
     "Login",
     async (values) => {
       const data = await api("POST", "/auth/login/", values);
-      // Fetch user profile
-      const user = await api("GET", "/auth/me/", undefined, false, data.access).catch(() => ({
-        username: values.username,
-        is_staff: false,
-      }));
-      setAuth({ access: data.access, refresh: data.refresh, user });
-      showFlash(`Welcome back, ${user.username}!`);
+      // Store tokens first so subsequent calls (like /auth/me/) carry Authorization: Bearer
+      setAuth({ access: data.access, refresh: data.refresh, user: { username: values.username, is_staff: false } });
+      try {
+        const user = await api("GET", "/auth/me/");
+        setAuth({ access: data.access, refresh: data.refresh, user });
+      } catch {
+        // Keep fallback user if /auth/me fails
+      }
+      const currentUser = getCurrentUser();
+      showFlash(`Welcome back, ${currentUser ? currentUser.username : values.username}!`);
       location.hash = nextRoute;
       return "logged in successfully";
     }
